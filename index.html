@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title data-language="label_commonTitle" class="fwLanguage">W-Connect</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+    <!-- Bootstrap 3.3.5 -->
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css" />
+    <!--loading-->
+    <link rel="stylesheet" href="assets/css/fw.css" />
+    <link rel="stylesheet" href="assets/dist/css/AdminLTE.min.css" />
+    <link rel="icon" sizes="192x192" href="assets/css/images/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" href="../assets/css/images/favicon.ico">
+    <!-- Tile icon for Win8 (144x144 + tile color) -->
+    <meta name="msapplication-TileImage" content="../assets/css/images/favicon.ico">
+    <script src="assets/bowl/bowl.min.js"></script>
+</head>
+
+<body class="hold-transition skin-blue login-page">
+    <div id="resetPassword" style="text-align: left;margin-top: 15px;display: none;padding: 0 20px;">
+        <span class="fwLanguage" data-language="label_login_resetPasswordTip">First login or password reset, you need to re-set the password</span>
+        <input type="password" id="newPassword" maxlength="40" placeholder="Enter value" oninput="no_ZH_CN(this)" class="form-control col-lg-5 fwLanguage" data-language="input_frontDeskSchedule_value" />
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3">
+                <div class="login-box">
+                    <div class="login-box-body">
+                        <h3 class="login-box-msg fwLanguage" data-language="label_login_title_b">Welcome to the Employee Management System</h3>
+                        <form id="form_login" class="form-horizontal" style="position: relative;" onsubmit="return false;">
+                            <div class="box-body" style="position: absolute;">
+                                <div class="form-group center-block">
+                                    <div id="loading" style="display:none;">
+                                        <i class="loadingicon"></i>
+                                        <span class="fwLanguage" data-language="label_login_waiting">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <label for="input_login_username" class="col-sm-3 control-label fwLanguage" data-language="label_login_username">Username</label>
+                                    <div class="col-sm-9">
+                                        <input id="input_login_username" type="text" class="form-control fwLanguage" data-language="input_login_username" placeholder="Username" name="account" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="input_login_password" class="col-sm-3 control-label fwLanguage" data-language="label_login_password">Password</label>
+                                    <div class="col-sm-9">
+                                        <input id="input_login_password" type="password" class="form-control fwLanguage" data-language="input_login_password" placeholder="Password" name="password" />
+                                    </div>
+                                </div>
+                            </div>
+                            <!--form button-->
+                            <div class="box-footer">
+                                <div id="area_login" class="col-xs-10 col-xs-offset-1">
+                                    <button type="reset" class="btn btn-info fwLanguage" data-language="btn_login_cancel" id="btn_login_cancel">Reset</button>
+                                    <button type="button" class="btn btn-primary pull-right fwLanguage" data-language="btn_login_sign" id="btn_login_sign" disabled="disabled">Login</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- /.login-box-body -->
+                </div>
+                <!-- /.login-box -->
+            </div>
+        </div>
+    </div>
+    <!--[if lt IE 9]>
+<script src="assets/js/respond.min.js"></script>
+<![endif]-->
+    <!-- jQuery 2.1.4 -->
+    <script src="assets/jQuery/jQuery-2.1.4.min.js"></script>
+    <script src="assets/layer/layer.js"></script>
+    <script src="assets/canvasParticles/canvas-particle.js"></script>
+    <script type="text/javascript">
+	var serviceUrl = "http://apilocalhost.friendwell.com:8081/basicManage/";
+//	var serviceUrl = "https://api.friendwell.com/basicManage/";
+
+	$(function() {
+		//检测
+	    if (window.localStorage) {
+	        if(!localStorage.getItem('clearLocalstorageVersion') || localStorage.getItem('clearLocalstorageVersion') != '1.0.0'){
+    			localStorage.clear();
+    			localStorage.setItem('clearLocalstorageVersion', '1.0.0');
+    		}
+	    } else {
+	        alert('This browser does NOT support localStorage.Please use Chrome.');
+    		return;
+	    }
+		/*进度条  
+		 * sdd 2017-05-09*/
+		NProgress.start();
+		var bowl = new Bowl();
+		bowl.add([{
+			url: projectName + 'assets/lodash/lodash.min.js',
+			key: localResourcesName + '_lodash'
+		}, {
+			url: projectName + 'assets/bootstrap/js/bootstrap.min.js',
+			key: localResourcesName + '_bootstrap',
+			dependencies: [localResourcesName + '_lodash']
+		}, {
+			url: projectName + 'assets/internationalization/i18n/jquery.json-2.3.min.js',
+			key: localResourcesName + '_json'
+		}, {
+			url: projectName + 'assets/internationalization/i18n/jquery.i18n.properties-1.2.2.js',
+			key: localResourcesName + '_i18n'
+		}, {
+			url: projectName + 'assets/validator/bootstrapValidator.min.js',
+			key: localResourcesName + '_bootstrapValidator',
+			dependencies: [localResourcesName + '_bootstrap']
+		}, ])
+	
+		bowl.inject().then(() => {
+			localStorage.removeItem("employee_current");
+	        localStorage.removeItem("employee_finalConfig");
+	        localStorage.removeItem("employee_menuHtml");
+			/*页面资源加载完成进度条,登录键变为可点击状态   
+			 * sdd 2017-05-09*/
+			NProgress.done();
+			$('#btn_login_sign').attr('disabled', false);
+			// 你的代码
+			pageInit();
+		})
+	
+		/*背景粒子效果*/
+		window.onload = function() {
+			var config = {
+				vx: 2,
+				vy: 2,
+				height: 3,
+				width: 3,
+				count: 240,
+				//              color: "255, 255, 149",
+				//              stroke: "255,255,149",
+				//              color: "54, 255, 127",
+				//              stroke: "54,255,127",
+				//              color: "25, 232, 255",
+				//              stroke: "25,232,255",
+				color: "255, 255, 255",
+				stroke: "255,255,255",
+				dist: 20000,
+				e_dist: 40000,
+				max_conn: 10
+			}
+			CanvasParticle(config);
+		}
+	});
+    //初始化表单
+    function form_init() {
+        $('#form_login').bootstrapValidator({
+            //message: 'This value is not valid',   //提示
+            feedbackIcons: { //回调图标
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: { //校验字段
+                account: {
+                    //message: 'The username is not valid',
+                    validators: {
+                        notEmpty: {
+                            // message: 'The username is required and cannot be empty'
+                        },
+                        stringLength: {
+                            min: 6,
+                            max: 60,
+                            //message: 'The username must be more than 6 and less than 30 characters long'
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z0-9_\.]+$/,
+                            // message: 'The username can only consist of alphabetical, number, dot and underscore'
+                        }
+                    }
+                },
+                password: {
+                    validators: {
+                        notEmpty: {
+                            //message: 'The password is required and cannot be empty'
+                        },
+                        different: {
+                            field: 'account',
+                            // message: 'The password cannot be the same as username'
+                        },
+                        stringLength: {
+                            min: 6,
+                            max: 30,
+                            //message: 'The username must be more than 6 and less than 30 characters long'
+                        }
+                    }
+                }
+            }
+        });
+    }
+    //初始化
+    function pageInit() {
+        //国际化，回调执行  en-US，zh-CN
+        loadProperties1('', function(_language) {});
+
+        var _language = "en-US";
+        $("script[src^='assets/validator/language/']").remove();
+        var form_i18n = "assets/validator/language/" + _language + ".js";
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = form_i18n;
+        document.body.appendChild(script);
+        form_init();
+        //用户重置
+        $("#btn_login_cancel").bind('click', function(e) {
+            e.preventDefault();
+            $('#form_login').data('bootstrapValidator').resetForm(true);
+        });
+        //用户登录
+        $('#btn_login_sign').bind('click', function(e) {
+            e.preventDefault();
+            /*点击时候触发输入验证判断  
+             * sdd 2017-05-09*/
+            var bootstrapValidator = $("#form_login").data('bootstrapValidator');
+            bootstrapValidator.validate();
+            if (!bootstrapValidator.isValid())
+                return false;
+            var form_data = $("#form_login").serializeObject();
+            myAjax('POST', serviceUrl + "auth", JSON.stringify(form_data),
+                function(obj) {
+                    delete obj.user.password;
+                    layer.closeAll();
+                    if (obj.user.isAdmin != 0) {
+                        layer.msg($.i18n.prop('label_login_isEmployee'));
+                        return;
+                    }
+                    var _current = {};
+                    _current.user = obj.user;
+                    _current.authKey = obj.authKey;
+                    localStorage.setItem("employee_current", JSON.stringify(_current));
+                    if (obj.user.passwordReset == 1) {
+                        layer.open({
+                            skin: 'layui-layer-lan',
+                            type: 1,
+                            closeBtn: 0,
+                            title: $.i18n.prop("label_login_resetPassword"),
+                            content: $("#resetPassword"),
+                            btn: [$.i18n.prop("label_departmentCreat_confirm")],
+                            area: ['450px', '200px'],
+                            yes: function(index) {
+                                var newPassword = $("#newPassword").val();
+                                if (newPassword.length < 6) {
+                                    layer.msg($.i18n.prop("label_login_numberLimit"));
+                                    return;
+                                }
+                                var resetParam = JSON.stringify({
+                                    password: $("#newPassword").val()
+                                });
+                                myAjax("PUT", serviceUrl + "auth/password", resetParam, function() {
+                                    window.location.href = 'modules/dashboard/dashboard.html?v=' + Math.random();
+                                })
+                            },
+                        });
+                    } else {
+                        window.location.href = 'modules/dashboard/dashboard.html?v=' + Math.random();
+                    }
+                }
+            );
+        });
+    }
+
+    function loadProperties1(language, page_i18n) {
+        //options : ,name,language,path,mode,cache,encoding,callback
+        //i18n nation : en-US, zh-CN ,zh-CN ,en-GB
+        //判断语言----->加载语言文件时，由于截取串的不同，导致又一次文件加载失败
+        var _language = "en-US";
+        //              if(!language) {} else {
+        //                  if(typeof language == "string") {
+        //                      _language = language;
+        //                  }
+        //              }
+        //console.log(_language);
+        //加载资浏览器语言对应的资源文件
+        jQuery.i18n.properties({
+            async: true,
+            name: 'strings25', //资源文件名称
+            path: 'assets/internationalization/i18n/', //资源文件路径
+            mode: 'map', //用Map的方式使用资源文件中的值
+            cache: true,
+            language: _language,
+            callback: function() {
+                page_i18n(_language);
+            }
+        });
+    };
+    </script>
+</body>
+
+</html>
